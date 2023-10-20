@@ -1,19 +1,22 @@
-const { Mongoose } = require("mongoose");
+const { mongoose } = require("mongoose");
 
-const Schema = new Mongoose.Schema({
+const Schema = new mongoose.Schema({
   first_name: { type: String },
   last_name: { type: String },
-  username: { type: String ,lowercase:true},
-  phone: { type: String },
-  email: { type: String ,lowercase:true},
+  username: { type: String, lowercase: true },
+  mobile: { type: String, required: true },
+  email: { type: String, lowercase: true },
   password: { type: String },
-  otp: { type: String ,default:{code:"",expires:new Date().getDate()+120}},
-  bills:{type:[],default:[]},
-  discount:{type:Number,default:0},
-  birthday:{type:String},
-  roles:{type:[String],default:"USER"}
+  otp: {
+    type: Object,
+    default: { code: 0, expiresIn: 0 },
+  },
+  bills: { type: [], default: [] },
+  discount: { type: Number, default: 0 },
+  birthday: { type: String },
+  roles: { type: [String], default: "USER" },
 });
 
 module.exports = {
-  UserModel: Mongoose.model("user", Schema),
+  UserModel: mongoose.model("user", Schema),
 };

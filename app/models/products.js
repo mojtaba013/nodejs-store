@@ -1,6 +1,6 @@
-const { Mongoose, default: mongoose } = require("mongoose");
+const { mongoose } = require("mongoose");
 
-const Schema=new Mongoose.Schema({
+const Schema=new mongoose.Schema({
 title:{type:String,required:true},
 short_desc:{type:String,required:true},
 total_desc:{type:String,required:true},
@@ -31,5 +31,5 @@ feture:{type:Object,default:{
 })
 
 module.exports={
-    ProductModel:Mongoose.model("product",Schema)
+    ProductModel:mongoose.model("product",Schema)
 }

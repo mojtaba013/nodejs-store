@@ -1,6 +1,6 @@
-const { Mongoose, default: mongoose } = require("mongoose");
+const { mongoose } = require("mongoose");
 
-const Schema = new Mongoose.Schema({
+const Schema = new mongoose.Schema({
   author: { type: mongoose.Types.ObjectId, required: true },
   title: { type: String, required: true },
   text: { type: String, required: true },
@@ -14,5 +14,5 @@ const Schema = new Mongoose.Schema({
 });
 
 module.exports = {
-  BlogModel: Mongoose.model("blog", Schema),
+  BlogModel: mongoose.model("blog", Schema),
 };
