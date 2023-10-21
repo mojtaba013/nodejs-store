@@ -1,6 +1,6 @@
-const homeController = require('../../http/controllers/api/home.controller')
+const homeController = require("../../http/controllers/api/home.controller");
 
-const router=require('express').Router()
+const router = require("express").Router();
 /**
  * @swagger
  * tags:
@@ -8,15 +8,14 @@ const router=require('express').Router()
  *  description : index page route and dat
  */
 
-
 /**
  * @swagger
  * /:
  *  get:
- *      summary: index of routes 
+ *      summary: index of routes
  *      tags: [IndexPage]
  *      description : get all need data for index page
- *    
+ *
  *      responses:
  *          200:
  *              description: success
@@ -24,8 +23,7 @@ const router=require('express').Router()
  *               not found
  */
 
-
-router.get('/',homeController.indexPage)
-module.exports={
-    HomeRoutes:router
-}
+router.get("/", homeController.indexPage);
+module.exports = {
+  HomeRoutes: router,
+};

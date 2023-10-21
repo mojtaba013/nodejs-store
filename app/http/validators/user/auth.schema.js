@@ -1,5 +1,5 @@
 const joi = require("@hapi/joi");
-const authSchema = joi.object({
+const getOtpSchema = joi.object({
   mobile: joi
     .string()
     .length(11)
@@ -7,6 +7,19 @@ const authSchema = joi.object({
     .error(new Error("شماره موبایل وارد شده صحیح نمیباشد")),
 });
 
+const checkOtpSchema = joi.object({
+  mobile: joi
+    .string()
+    .length(11)
+    .pattern(/^09[0-9]{9}$/)
+    .error(new Error("شماره موبایل وارد شده صحیح نمیباشد")),
+  code: joi
+    .string()
+    .min(4)
+    .max(6)
+    .error(new Error("کد ارسال شده صحیح نمی باشد")),
+});
+
 module.exports = {
-  authSchema,
+  getOtpSchema,checkOtpSchema
 };
