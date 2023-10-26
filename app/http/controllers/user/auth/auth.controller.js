@@ -6,12 +6,16 @@ const {
 const {
   randomNumberGenerator,
   SignAccessToken,
+  SignRefreshToken,
 } = require("../../../../utils/functions");
 const { UserModel } = require("../../../../models/users");
 const { EXPIRES_IN, USER_ROLE } = require("../../../../utils/constans");
 const Controller = require("../../controller");
+const { verify } = require("jsonwebtoken");
+const { verifyRefreshToken } = require("../../../middlewares/verifyAccessToken");
 
 class UserAuthController extends Controller {
+
   async getOtp(req, res, next) {
     try {
       await getOtpSchema.validateAsync(req.body);
@@ -45,13 +49,35 @@ class UserAuthController extends Controller {
       if (+user.otp.expiresIn < now)
         throw createHttpError.Unauthorized("کد ارسالی منقضی شده است");
       const accessToken =await SignAccessToken(user._id);
+      const refreshToken=await SignRefreshToken(user._id)
+
       return res.json({
         data: {
           accessToken,
+          refreshToken
         },
       });
     } catch (error) {
       next(error);
+    }
+  }
+
+  async refreshToken(req,res,next){
+    try {
+      const{refreshToken}=req.body
+      const mobile=await verifyRefreshToken(refreshToken)
+      const user=UserModel.findOne({mobile})
+      const accessToken=await SignAccessToken(user._id)
+      const newRefreshToken=await SignRefreshToken(user._id)
+      return res.json({
+        data:{
+          accessToken,
+          refreshToken:newRefreshToken
+        }
+      })
+      
+    } catch (error) {
+      next(error)
     }
   }
 

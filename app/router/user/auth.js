@@ -64,6 +64,27 @@ router.post("/get-otp", UserAuthController.getOtp);
  */
 
 router.post("/check-otp", UserAuthController.checkOtp);
+/**
+ * @swagger
+ *  /user/refresh-token:
+ *      post:
+ *          tags: [User-Authentication]
+ *          summary: send refresh token ffor get new token and refresh token
+ *          description : fresh token
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/x-www-form-urlencoded:
+ *                      schema:
+ *                          $ref: '#/components/schemas/RefreshToken'
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/RefreshToken'
+ *          responses:
+ *              200:
+ *                  description : success
+ */
+router.post("/refresh-token", UserAuthController.refreshToken);
 module.exports = {
   UserAuthRoutes: router,
 };
