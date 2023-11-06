@@ -12,10 +12,12 @@ const { UserModel } = require("../../../../models/users");
 const { EXPIRES_IN, USER_ROLE } = require("../../../../utils/constans");
 const Controller = require("../../controller");
 const { verify } = require("jsonwebtoken");
-const { verifyRefreshToken } = require("../../../middlewares/verifyAccessToken");
+const {
+  verifyRefreshToken,
+} = require("../../../middlewares/verifyAccessToken");
+const { date } = require("@hapi/joi");
 
 class UserAuthController extends Controller {
-
   async getOtp(req, res, next) {
     try {
       await getOtpSchema.validateAsync(req.body);
@@ -45,16 +47,16 @@ class UserAuthController extends Controller {
       if (user.otp.code != code)
         throw createHttpError.Unauthorized("کد ارسال شده صحیح نمی باشد");
       //علامت + برای تبدیل به عدد
-      const now = (new Date()).getTime();
+      const now = new Date().getTime();
       if (+user.otp.expiresIn < now)
         throw createHttpError.Unauthorized("کد ارسالی منقضی شده است");
-      const accessToken =await SignAccessToken(user._id);
-      const refreshToken=await SignRefreshToken(user._id)
+      const accessToken = await SignAccessToken(user._id);
+      const refreshToken = await SignRefreshToken(user._id);
 
       return res.json({
         data: {
           accessToken,
-          refreshToken
+          refreshToken,
         },
       });
     } catch (error) {
@@ -62,29 +64,28 @@ class UserAuthController extends Controller {
     }
   }
 
-  async refreshToken(req,res,next){
+  async refreshToken(req, res, next) {
     try {
-      const{refreshToken}=req.body
-      const mobile=await verifyRefreshToken(refreshToken)
-      const user=UserModel.findOne({mobile})
-      const accessToken=await SignAccessToken(user._id)
-      const newRefreshToken=await SignRefreshToken(user._id)
+      const { refreshToken } = req.body;
+      const mobile = await verifyRefreshToken(refreshToken);
+      const user = UserModel.findOne({ mobile });
+      const accessToken = await SignAccessToken(user._id);
+      const newRefreshToken = await SignRefreshToken(user._id);
       return res.json({
-        data:{
+        data: {
           accessToken,
-          refreshToken:newRefreshToken
-        }
-      })
-      
+          refreshToken: newRefreshToken,
+        },
+      });
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
   async saveUser(mobile, code) {
     let otp = {
       code,
-      expiresIn: EXPIRES_IN,
+      expiresIn: new Date().getTime() + 120000,
     };
     const result = await this.checkExistUser(mobile);
     if (result) {

@@ -17,6 +17,7 @@ module.exports = class Application {
     this.#PORT = PORT;
     this.#DB_URI = DB_URI;
     this.configApplication();
+    this.initRedis();
     this.connectToMongoDB();
     this.createServer(this.#PORT);
     this.createRoutes();
@@ -66,6 +67,10 @@ module.exports = class Application {
     mongoose.connection.on("disconnected", () => {
       console.log("mongoose connection is disconnected");
     });
+  }
+
+  initRedis() {
+    require("./utils/init_redis");
   }
 
   createRoutes() {
