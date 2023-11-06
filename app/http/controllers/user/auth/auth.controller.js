@@ -9,7 +9,7 @@ const {
   SignRefreshToken,
 } = require("../../../../utils/functions");
 const { UserModel } = require("../../../../models/users");
-const { EXPIRES_IN, USER_ROLE } = require("../../../../utils/constans");
+const { ROLES } = require("../../../../utils/constans");
 const Controller = require("../../controller");
 const { verify } = require("jsonwebtoken");
 const {
@@ -91,7 +91,7 @@ class UserAuthController extends Controller {
     if (result) {
       return await this.updateUser(mobile, { otp });
     }
-    return !!(await UserModel.create({ mobile, otp, roles: [USER_ROLE] }));
+    return !!(await UserModel.create({ mobile, otp, roles: [ROLES.USER] }));
   }
 
   async checkExistUser(mobile) {
