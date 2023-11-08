@@ -1,8 +1,12 @@
 const createHttpError = require("http-errors");
 const { CategoryModel } = require("../../../models/categories");
 const Controller = require("../controller");
-const { addCategorySchema } = require("../../validators/admin/category.schema");
-const  mongoose  = require("mongoose");
+const {
+  addCategorySchema,
+  updateCategorySchema,
+} = require("../../validators/admin/category.schema");
+const mongoose = require("mongoose");
+const categories = require("../../../models/categories");
 
 class CategoryController extends Controller {
   async addCategory(req, res, next) {
@@ -44,8 +48,23 @@ class CategoryController extends Controller {
     }
   }
 
-  editCategory(req, res, next) {
+  async editCategoryTitle(req, res, next) {
     try {
+      const { id } = req.params;
+      const { title } = req.body;
+      const category = await this.checkExistCategory(id);
+      await updateCategorySchema.validateAsync(req.body);
+      const resultOfUpdate = await CategoryModel.updateOne(
+        { _id: id },
+        { $set: {title} }
+      );
+      if (resultOfUpdate.modifiedCount == 0)
+        throw createHttpError.InternalServerError("به روز رسانی انجام نشد");
+      return res.status(200).json({
+        data: {
+          message: "به روز رسانی با موفقیت انجام شد",
+        },
+      });
     } catch (error) {
       next(error);
     }
@@ -85,13 +104,26 @@ class CategoryController extends Controller {
     }
   }
 
+  async getAllCategoryWithoutPopulate(req, res, next) {
+    try {
+      const categories = await CategoryModel.aggregate([{ $match: {} }]);
+      return res.status(200).json({
+        data: {
+          categories,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getCategoryById(req, res, next) {
     try {
-      const { id:_id } = req.params;
+      const { id: _id } = req.params;
       const category = await CategoryModel.aggregate([
         {
           $match: {
-            _id:new mongoose.Types.ObjectId(_id),
+            _id: new mongoose.Types.ObjectId(_id),
           },
         },
         {
