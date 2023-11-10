@@ -1,12 +1,20 @@
+const { BlogModel } = require("../../../models/blogs");
+const { deleteFileInPublic } = require("../../../utils/functions");
 const { createBlogSchema } = require("../../validators/admin/blog.schema");
 const Controller = require("../controller");
-
+const path=require('path')
 class BlogController extends Controller {
   async createBlog(req, res, next) {
     try {
       const blogDataBody=await createBlogSchema.validateAsync(req.body)
-      return res.json(blogDataBody)
+      req.body.image=path.join(blogDataBody.fileUploadPath,blogDataBody.filename)
+      req.body.image=req.body.image.replace(/\\/g,'/')
+      const {title,text,short_text,tags,categoy}=blogDataBody
+      const image=req.body.image
+      const blog=await BlogModel.create({title,image,text,short_text,tags,categoy})
+      return res.json({blogDataBody,image:req.body.image})
     } catch (error) {
+      deleteFileInPublic(req.body.image)
       next(error);
     }
   }
