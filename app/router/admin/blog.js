@@ -10,6 +10,13 @@ const { uploadFiles } = require("../../utils/multer");
  *          get:
  *              tags: [Blog(AdminPanel)]
  *              summary: get all blogs
+ *              parameters:
+ *                  -   in: header
+ *                      example: Bearer token
+ *                      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTY5OTcxMTU3MywiZXhwIjoxNjk5Nzk3OTczfQ.5PBSDTLcjsGNOkqq3zpks7myEHoFnFFseC_6RZNfWY4
+ *                      name: access-token
+ *                      type: string
+ *                      required: true
  *              responses:
  *                  200:
  *                      description: succcee-get array of blogs
@@ -24,6 +31,12 @@ router.get("/", AdminBlogController.getListOfBlog);
  *              consumes: 
  *                  - multipart/form-data
  *              parameters:
+ *                  -   in: header
+ *                      example: Bearer token
+ *                      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTY5OTcxMTU3MywiZXhwIjoxNjk5Nzk3OTczfQ.5PBSDTLcjsGNOkqq3zpks7myEHoFnFFseC_6RZNfWY4
+ *                      name: access-token
+ *                      type: string
+ *                      required: true
  *                  -   in: formData
  *                      name: title
  *                      required: true

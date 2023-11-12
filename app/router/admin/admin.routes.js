@@ -1,3 +1,4 @@
+const { verifyAccessToken } = require('../../http/middlewares/verifyAccessToken')
 const { BlogAdminApiRoutes } = require('./blog')
 const { CategoryRoutes } = require('./category')
 
@@ -13,7 +14,7 @@ const router=require('express').Router()
  *         description: make blog management  admin panel
  */
 router.use('/category',CategoryRoutes)
-router.use('/blogs',BlogAdminApiRoutes)
+router.use('/blogs',verifyAccessToken, BlogAdminApiRoutes)
 module.exports={
     AdminRoutes:router
 }
