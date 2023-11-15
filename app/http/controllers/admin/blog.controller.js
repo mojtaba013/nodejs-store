@@ -4,6 +4,7 @@ const { deleteFileInPublic } = require("../../../utils/functions");
 const { createBlogSchema } = require("../../validators/admin/blog.schema");
 const Controller = require("../controller");
 const path = require("path");
+const { array } = require("@hapi/joi");
 class BlogController extends Controller {
   async createBlog(req, res, next) {
     try {
@@ -108,19 +109,19 @@ class BlogController extends Controller {
     }
   }
 
-
-
   async deleteBlogById(req, res, next) {
     try {
-      const {id}=req.params
-      await this.findBlog(id)
-      const result=await BlogModel.deleteOne({_id:id})
-      if(result.deleteCount==0) throw createHttpError.InternalServerError('delete blog failed.')
+      const { id } = req.params;
+      await this.findBlog(id);
+      const result = await BlogModel.deleteOne({ _id: id });
+      if (result.deleteCount == 0)
+        throw createHttpError.InternalServerError("delete blog failed.");
       return res.status(200).json({
-    data:{
-      statusCode:200,
-      message:'blog deleted.'
-    }})
+        data: {
+          statusCode: 200,
+          message: "blog deleted.",
+        },
+      });
     } catch (error) {
       next(error);
     }
@@ -128,7 +129,36 @@ class BlogController extends Controller {
 
   async updateBlogById(req, res, next) {
     try {
+      const { id } = req.params;
+      await this.findBlog(id);
+      if (req?.body?.fileUploadPath && req?.body?.filename) {
+        req.body.image = path.join(req.body.fileUploadPath, req.body.filename);
+        req.body.image = req.body.image.replace(/\\/g, "/");
+      }
+      const data = req.body;
+      let nullishData = ["", " ", 0, "0", null, undefined];
+      let blackListField = ["bookmarks", "dislikes", "comments", "likes"];
+      Object.keys(data).forEach((key) => {
+        if (blackListField.includes(key)) delete data[key];
+        if (typeof data[key] == "string") data[key] = data[key].trim();
+        if (Array.isArray(data[key]) && Array.length > 0)
+          data[key] = data[key].map((i) => i.trim());
+        if (nullishData.includes(data[key])) delete data[key];
+      });
+      const updateResult = await BlogModel.updateOne(
+        { _id: id },
+        { $set: data }
+      );
+      if (updateResult.modefiedCount == 0)
+        throw createHttpError.InternalServerError("blog update failed.");
+      return res.status(201).json({
+        data: {
+          statuscode: 201,
+          message: "blog update successfull",
+        },
+      });
     } catch (error) {
+      deleteFileInPublic(req?.body?.image);
       next(error);
     }
   }

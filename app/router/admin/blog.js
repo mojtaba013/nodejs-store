@@ -68,6 +68,49 @@ router.get("/", AdminBlogController.getListOfBlog);
  */
 router.post("/add",uploadFiles.single('image'),stringToArray('tags'), AdminBlogController.createBlog);
 /**
+ *  @swagger
+ *      /admin/blogs/update/{id}:
+ *          patch:
+ *              tags: [Blog(AdminPanel)]
+ *              summary: update blogs by id
+ *              consumes: 
+ *                  - multipart/form-data
+ *              parameters:
+ *                  -   in: header
+ *                      example: Bearer token
+ *                      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTcwMDA2MzAyNSwiZXhwIjoxNzMxNjIwNjI1fQ.9K6p7PcTy9AHDhdMSVbfoxYx5ZphCz-GdG5i0aL4Sck
+ *                      name: access-token
+ *                      type: string
+ *                      required: true
+ *                  -   in: path
+ *                      name: id
+ *                      type: string
+ *                      required: true
+ *                  -   in: formData
+ *                      name: title
+ *                      type: string
+ *                  -   in: formData
+ *                      name: text
+ *                      type: string
+ *                  -   in: formData
+ *                      name: short_text
+ *                      type: string
+ *                  -   in: formData
+ *                      name: tags
+ *                      example: tag1#tag2#tag3
+ *                      type: string
+ *                  -   in: formData
+ *                      name: category
+ *                      type: string
+ *                  -   in: formData
+ *                      name: image
+ *                      type: file
+ *              responses:
+ *                  200:
+ *                      description: succcee-get array of blogs
+ */
+router.patch("/update/:id",uploadFiles.single('image'),stringToArray('tags'), AdminBlogController.updateBlogById);
+/**
  * @swagger
  *  /admin/blogs/{id}:
  *        get:

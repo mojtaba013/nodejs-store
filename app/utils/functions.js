@@ -8,8 +8,8 @@ const {
   REFRESH_TOKEN_SECRET_KEY,
 } = require("./constans");
 const redisClient = require("./init_redis");
-const fs=require('fs');
-const  path  = require('path');
+const fs = require("fs");
+const path = require("path");
 
 const randomNumberGenerator = () => {
   return Math.floor(Math.random() * 90000 + 10000);
@@ -42,7 +42,7 @@ function SignRefreshToken(userId) {
     };
     JWT.sign(payload, REFRESH_TOKEN_SECRET_KEY, option, async (err, token) => {
       if (err) reject(createHttpError.InternalServerError("خطایی رخ داده است"));
-      await redisClient.SETEX(String(userId), (365 * 24 * 60 * 60), token);
+      await redisClient.SETEX(String(userId), 365 * 24 * 60 * 60, token);
       resolve(token);
     });
   });
@@ -57,16 +57,17 @@ function verifyRefreshToken(token) {
       const user = await UserModel.findOne({ mobile }, { password: 0, opt: 0 });
       if (!user) reject(createHttpError.Unauthorized("حساب کاربری یافت نشد"));
       const refreshToken = await redisClient.get(user._id);
-      if(token===refreshToken)return resolve(mobile);
-      reject(createHttpError.Unauthorized('ورود به حساب کاربری انجام نشد'))
-      
+      if (token === refreshToken) return resolve(mobile);
+      reject(createHttpError.Unauthorized("ورود به حساب کاربری انجام نشد"));
     });
   });
 }
 
-function deleteFileInPublic(fileAddress){
-  const pathFile=path.join(__dirname,"..","..","public",fileAddress)
-  fs.unlinkSync(pathFile)
+function deleteFileInPublic(fileAddress) {
+  if (fileAddress) {
+    const pathFile = path.join(__dirname, "..", "..", "public", fileAddress);
+    if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+  }
 }
 
 module.exports = {
@@ -74,5 +75,5 @@ module.exports = {
   SignAccessToken,
   SignRefreshToken,
   verifyRefreshToken,
-  deleteFileInPublic
+  deleteFileInPublic,
 };
