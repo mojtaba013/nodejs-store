@@ -5,7 +5,7 @@ const CommentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: new Date().getTime() },
   parent: { type: mongoose.Types.ObjectId },
 });
-const Schema = new mongoose.Schema(
+const BlogSchema = new mongoose.Schema(
   {
     author: { type: mongoose.Types.ObjectId, required: true },
     title: { type: String, required: true },
@@ -22,6 +22,17 @@ const Schema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 
+BlogSchema.virtual("user", {
+  ref : "user",
+  localField : "_id",
+  foreignField: "author"
+})
+BlogSchema.virtual("category_detail", {
+  ref : "category",
+  localField : "_id",
+  foreignField: "category"
+})
+
 module.exports = {
-  BlogModel: mongoose.model("blog", Schema),
+  BlogModel: mongoose.model("blog", BlogSchema),
 };

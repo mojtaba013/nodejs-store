@@ -5,6 +5,7 @@ const {
 } = require("../../utils/constans");
 const createHttpError = require("http-errors");
 const { UserModel } = require("../../models/users");
+const redisClient = require("redis");
 
 function verifyAccessToken(req, res, next) {
   const headers = req.headers;
@@ -31,8 +32,15 @@ function verifyRefreshToken(token) {
       const { mobile } = payload || {};
       const user = await UserModel.findOne({ mobile }, { password: 0, otp: 0 });
       if (!user) reject(createHttpError.Unauthorized("حساب کاربری یافت نشد"));
-      req.user = user;
-      resolve(mobile);
+      const refreshToken = await redisClient.get(user?._id || "key_default");
+      if (!refreshToken)
+        reject(
+          createHttpError.Unauthorized("ورود مجدد به حساب کاربری انجام نشد")
+        );
+      if (token === refreshToken) return resolve(mobile);
+      reject(
+        createHttpError.Unauthorized("ورود مجدد به حساب کاربری انجام نشد")
+      );
     });
   });
 }

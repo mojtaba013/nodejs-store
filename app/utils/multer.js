@@ -37,7 +37,7 @@ function fileFilter(req,file,cb){
 }
 
 const maxSize=1*1000*1000
-const uploadFiles = multer({storage,fileFilter,limit:{fileSize:maxSize}});
+const uploadFiles = multer({storage,fileFilter,limits:{fileSize:maxSize}});
 
 module.exports = {
   uploadFiles,

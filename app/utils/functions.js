@@ -22,7 +22,7 @@ function SignAccessToken(userId) {
       mobile: user.mobile,
     };
     const option = {
-      expiresIn: "1d",
+      expiresIn: "1y",
     };
     JWT.sign(payload, ACCESS_TOKEN_SECRET_KEY, option, (err, token) => {
       if (err) reject(createHttpError.InternalServerError("خطایی رخ داده است"));
