@@ -7,21 +7,35 @@ const createHttpError = require("http-errors");
 const { UserModel } = require("../../models/users");
 const redisClient = require("redis");
 
-function verifyAccessToken(req, res, next) {
-  const headers = req.headers;
+function getToken(headers) {
   const [bearer, token] = headers?.["access-token"]?.split(" ") || [];
-  if (token && ["Bearer", "bearer"].includes(bearer))
+  if (token && ["Bearer", "bearer"].includes(bearer)) return token;
+  throw createHttpError.Unauthorized(
+    "حساب کاربری شناسایی نشد وارد حساب کاربری خود شوید"
+  );
+}
+
+function verifyAccessToken(req, res, next) {
+  try {
+    const token = getToken(req.headers);
     JWT.verify(token, ACCESS_TOKEN_SECRET_KEY, async (err, payload) => {
-      if (err)
-        return next(createHttpError.Unauthorized(" وارد حساب کاربری خود شوید"));
-      const { mobile } = payload || {};
-      const user = await UserModel.findOne({ mobile }, { password: 0, otp: 0 });
-      if (!user)
-        return next(createHttpError.Unauthorized("حساب کاربری یافت نشد"));
-      req.user = user;
-      return next();
+      try {
+        if (err) throw createHttpError.Unauthorized("وارد حساب کاربری خود شوید");
+        const { mobile } = payload || {};
+        const user = await UserModel.findOne(
+          { mobile },
+          { password: 0, otp: 0 }
+        );
+        if (!user) throw createHttpError.Unauthorized("حساب کاربری یافت نشد");
+        req.user = user;
+        return next();
+      } catch (error) {
+        next(error);
+      }
     });
-  else return next(createHttpError.Unauthorized(" وارد حساب کاربری خود شوید"));
+  } catch (error) {
+    next(error);
+  }
 }
 
 function verifyRefreshToken(token) {
@@ -45,7 +59,23 @@ function verifyRefreshToken(token) {
   });
 }
 
+function checkRole(role) {
+  return function (req, res, next) {
+    try {
+      const user = req.user;
+      console.log(user);
+      if (user.roles.includes(role)) return next();
+      throw createHttpError.Forbidden(
+        "You do not have permission to access this area"
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
 module.exports = {
   verifyAccessToken,
   verifyRefreshToken,
+  checkRole,
 };

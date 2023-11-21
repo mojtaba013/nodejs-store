@@ -35,7 +35,9 @@ module.exports = class Application {
       swaggerUI.serve,
       swaggerUI.setup(
         swaggerJsDoc({
+          
           swaggerDefinition: {
+            openapi: "3.0.0",
             info: {
               title: "boto start",
               version: "2.0.0",
@@ -45,7 +47,8 @@ module.exports = class Application {
           },
 
           apis: ["./app/router/**/*.js"],
-        })
+        }),
+        { explorer: true }
       )
     );
   }
