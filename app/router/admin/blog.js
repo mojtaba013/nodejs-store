@@ -22,6 +22,39 @@ const { uploadFiles } = require("../../utils/multer");
  *                      description: succcee-get array of blogs
  */
 router.get("/", AdminBlogController.getListOfBlog);
+/**
+ * @swagger
+ *  components:
+ *      schemas:
+ *          GetOTP:
+ *              type: object
+ *              required:
+ *                  -   mobile
+ *              properties:
+ *                  mobile:
+ *                      type: string
+ *                      description: the user mobile for signup/signin
+ *          CheckOTP:
+ *              type: object
+ *              required:
+ *                  -   mobile
+ *                  -   code
+ *              properties:
+ *                  mobile:
+ *                      type: string
+ *                      description: the user mobile for signup/signin
+ *                  code:
+ *                      type: integer
+ *                      description: reviced code from getOTP
+ *          RefreshToken:
+ *              type: object
+ *              required:
+ *                  -   refreshToken
+ *              properties:
+ *                  refreshToken:
+ *                      type: string
+ *                      description: enter refresh-token for get fresh token and refresh-token
+ */
 
 /**
  *  @swagger
@@ -32,12 +65,6 @@ router.get("/", AdminBlogController.getListOfBlog);
  *              consumes: 
  *                  - multipart/form-data
  *              parameters:
- *                  -   in: header
- *                      example: Bearer token
- *                      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTcwMDA2MzAyNSwiZXhwIjoxNzMxNjIwNjI1fQ.9K6p7PcTy9AHDhdMSVbfoxYx5ZphCz-GdG5i0aL4Sck
- *                      name: access-token
- *                      type: string
- *                      required: true
  *                  -   in: formData
  *                      name: title
  *                      required: true
@@ -76,12 +103,6 @@ router.post("/add",uploadFiles.single('image'),stringToArray('tags'), AdminBlogC
  *              consumes: 
  *                  - multipart/form-data
  *              parameters:
- *                  -   in: header
- *                      example: Bearer token
- *                      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTcwMDA2MzAyNSwiZXhwIjoxNzMxNjIwNjI1fQ.9K6p7PcTy9AHDhdMSVbfoxYx5ZphCz-GdG5i0aL4Sck
- *                      name: access-token
- *                      type: string
- *                      required: true
  *                  -   in: path
  *                      name: id
  *                      type: string
@@ -117,12 +138,6 @@ router.patch("/update/:id",uploadFiles.single('image'),stringToArray('tags'), Ad
  *            summary: get by id and populate field
  *            tags: [Blog(AdminPanel)]
  *            parameters:
- *                -   in: header
- *                    example: Bearer token
- *                    value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTcwMDA2MzAyNSwiZXhwIjoxNzMxNjIwNjI1fQ.9K6p7PcTy9AHDhdMSVbfoxYx5ZphCz-GdG5i0aL4Sck
- *                    name: access-token
- *                    type: string
- *                    required: true
  *                -   in: path
  *                    name: id
  *                    type: string
@@ -139,12 +154,6 @@ router.get('/:id',AdminBlogController.getOneBlogById)
  *            summary: delete by id and populate field
  *            tags: [Blog(AdminPanel)]
  *            parameters:
- *                -   in: header
- *                    example: Bearer token
- *                    value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTcwMDA2MzAyNSwiZXhwIjoxNzMxNjIwNjI1fQ.9K6p7PcTy9AHDhdMSVbfoxYx5ZphCz-GdG5i0aL4Sck
- *                    name: access-token
- *                    type: string
- *                    required: true
  *                -   in: path
  *                    name: id
  *                    type: string

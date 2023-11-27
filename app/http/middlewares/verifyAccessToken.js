@@ -8,7 +8,7 @@ const { UserModel } = require("../../models/users");
 const redisClient = require("redis");
 
 function getToken(headers) {
-  const [bearer, token] = headers?.["access-token"]?.split(" ") || [];
+  const [bearer, token] = headers?.authorization?.split(" ") || [];
   if (token && ["Bearer", "bearer"].includes(bearer)) return token;
   throw createHttpError.Unauthorized(
     "حساب کاربری شناسایی نشد وارد حساب کاربری خود شوید"
