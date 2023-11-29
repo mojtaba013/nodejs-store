@@ -1,7 +1,8 @@
-const { CategoryController } = require('../../http/controllers/admin/category.controller')
+const {
+  CategoryController,
+} = require("../../http/controllers/admin/category.controller");
 
-const router=require('express').Router()
-
+const router = require("express").Router();
 
 /**
  * @swagger
@@ -39,7 +40,7 @@ const router=require('express').Router()
  *                  description: success
  */
 
-router.post('/add',CategoryController.addCategory)
+router.post("/add", CategoryController.addCategory);
 /**
  * @swagger
  *  /admin/category/parents:
@@ -51,14 +52,13 @@ router.post('/add',CategoryController.addCategory)
  *                  description: success
  */
 
-
-router.get('/parents',CategoryController.getAllParents)
+router.get("/parents", CategoryController.getAllParents);
 /**
  * @swagger
  *  /admin/category/children/{parent}:
  *      get:
  *          tags: [Category(AdminPanel)]
- *          summary: get All children of Parents Category 
+ *          summary: get All children of Parents Category
  *          parameters:
  *              -   in: path
  *                  name: parent
@@ -68,18 +68,18 @@ router.get('/parents',CategoryController.getAllParents)
  *              200:
  *                  description: success
  */
-router.get('/children/:parent',CategoryController.getChildOfParents)
+router.get("/children/:parent", CategoryController.getChildOfParents);
 /**
  * @swagger
  *  /admin/category/all:
  *      get:
  *          tags: [Category(AdminPanel)]
- *          summary: get All Categories 
+ *          summary: get All Categories
  *          responses:
  *              200:
  *                  description: success
  */
-router.get('/all',CategoryController.getAllCategory)
+router.get("/all", CategoryController.getAllCategory);
 /**
  * @swagger
  *  /admin/category/remove/{id}:
@@ -95,7 +95,7 @@ router.get('/all',CategoryController.getAllCategory)
  *              200:
  *                  description: success
  */
-router.delete('/remove/:id',CategoryController.removeCategory)
+router.delete("/remove/:id", CategoryController.removeCategory);
 /**
  * @swagger
  *  /admin/category/list-of-all:
@@ -106,7 +106,7 @@ router.delete('/remove/:id',CategoryController.removeCategory)
  *              200:
  *                  description: success
  */
-router.get('/list-of-all',CategoryController.getAllCategoryWithoutPopulate)
+router.get("/list-of-all", CategoryController.getAllCategoryWithoutPopulate);
 /**
  * @swagger
  *  /admin/category/{id}:
@@ -122,7 +122,7 @@ router.get('/list-of-all',CategoryController.getAllCategoryWithoutPopulate)
  *              200:
  *                  description: success
  */
-router.get('/:id',CategoryController.getCategoryById)
+router.get("/:id", CategoryController.getCategoryById);
 /**
  * @swagger
  *  /admin/category/update/{id}:
@@ -146,11 +146,11 @@ router.get('/:id',CategoryController.getCategoryById)
  *          responses:
  *              200:
  *                  description: success
- *              500:    
+ *              500:
  *                  description: internalServerErorr
  */
-router.patch('/update/:id',CategoryController.editCategoryTitle)
+router.patch("/update/:id", CategoryController.editCategoryTitle);
 
-module.exports={
-    CategoryRoutes:router
-}
+module.exports = {
+  AdminApiCategoryRouter: router,
+};
