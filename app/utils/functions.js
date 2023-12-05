@@ -50,17 +50,17 @@ function SignRefreshToken(userId) {
 
 function verifyRefreshToken(token) {
   return new Promise((resolve, reject) => {
-    JWT.verify(token, REFRESH_TOKEN_SECRET_KEY, async (arr, payload) => {
-      if (err)
-        reject(createHttpError.Unauthorized("وارد حساب کاربری خود شوید"));
-      const { mobile } = payload || {};
-      const user = await UserModel.findOne({ mobile }, { password: 0, opt: 0 });
-      if (!user) reject(createHttpError.Unauthorized("حساب کاربری یافت نشد"));
-      const refreshToken = await redisClient.get(user._id);
-      if (token === refreshToken) return resolve(mobile);
-      reject(createHttpError.Unauthorized("ورود به حساب کاربری انجام نشد"));
-    });
-  });
+      JWT.verify(token, REFRESH_TOKEN_SECRET_KEY, async (err, payload) => {
+          if (err) reject(createHttpError.Unauthorized("وارد حساب کاربری خود شوید"))
+          const { mobile } = payload || {};
+          const user = await UserModel.findOne({ mobile }, { password: 0, otp: 0 })
+          if (!user) reject(createHttpError.Unauthorized("حساب کاربری یافت نشد"))
+          const refreshToken = await redisClient.get(String(user?._id));
+          if (!refreshToken) reject(createHttpError.Unauthorized("ورود مجدد به حسابی کاربری انجام نشد"))
+          if (token === refreshToken) return resolve(mobile);
+          reject(createHttpError.Unauthorized("ورود مجدد به حسابی کاربری انجام نشد"))
+      })
+  })
 }
 
 function deleteFileInPublic(fileAddress) {
@@ -70,10 +70,39 @@ function deleteFileInPublic(fileAddress) {
   }
 }
 
+function ListOfImagesFromRequest(files, fileUploadPath) {
+  if (files?.length > 0) {
+    return files
+      .map((file) => path.join(fileUploadPath, file.filename))
+      .map((item) => item.replace(/\\/g, "/"));
+  } else {
+    return [];
+  }
+}
+
+function setFeatures(body) {
+  const { colors, width, weight, height, length } = body;
+  let features = {};
+  features.colors = colors;
+  if (!isNaN(+width) || !isNaN(+height) || !isNaN(+weight) || !isNaN(+length)) {
+    if (!width) features.width = 0;
+    else features.width = +width;
+    if (!height) features.height = 0;
+    else features.height = +height;
+    if (!weight) features.weight = 0;
+    else features.weight = +weight;
+    if (!length) features.length = 0;
+    else features.length = +length;
+  }
+  return features;
+}
+
 module.exports = {
   randomNumberGenerator,
   SignAccessToken,
   SignRefreshToken,
   verifyRefreshToken,
   deleteFileInPublic,
+  ListOfImagesFromRequest,
+  setFeatures
 };

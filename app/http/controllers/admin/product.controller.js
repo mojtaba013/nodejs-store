@@ -1,8 +1,12 @@
+const { ProductModel } = require("../../../models/products");
+const { ListOfImagesFromRequest, setFeatures, deleteFileInPublic } = require("../../../utils/functions");
+const { createProductSchema } = require("../../validators/admin/product.schema");
 const Controller = require("../controller");
 
 class ProductController extends Controller{
 async addProduct(req,res,next){
     try {
+      console.log("req.body",req.body);
         const images = ListOfImagesFromRequest(req?.files || [], req.body.fileUploadPath)
         const productBody = await createProductSchema.validateAsync(req.body);
         const { title, text, short_text, category, tags, count, price, discount, type } = productBody;
@@ -22,14 +26,15 @@ async addProduct(req,res,next){
           supplier,
           type
         })
-        return res.status(HttpStatus.CREATED).json({
-          statusCode: HttpStatus.CREATED,
+        return res.status(200).json({
+          statusCode: 200,
           data: {
             message: "ثبت محصول با موفقیت انجام شد"
           }
         });
       } catch (error) {
         deleteFileInPublic(req.body.image)
+        console.log('error:',error);
         next(error);
       }
 }

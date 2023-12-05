@@ -7,14 +7,13 @@ const {
   randomNumberGenerator,
   SignAccessToken,
   SignRefreshToken,
+  verifyRefreshToken,
 } = require("../../../../utils/functions");
 const { UserModel } = require("../../../../models/users");
 const { ROLES } = require("../../../../utils/constans");
 const Controller = require("../../controller");
 const { verify } = require("jsonwebtoken");
-const {
-  verifyRefreshToken,
-} = require("../../../middlewares/verifyAccessToken");
+
 const { date } = require("@hapi/joi");
 
 class UserAuthController extends Controller {
@@ -69,13 +68,15 @@ class UserAuthController extends Controller {
     try {
       const { refreshToken } = req.body;
       const mobile = await verifyRefreshToken(refreshToken);
-      const user = UserModel.findOne({ mobile });
+      const user = await UserModel.findOne({ mobile });
       const accessToken = await SignAccessToken(user._id);
       const newRefreshToken = await SignRefreshToken(user._id);
-      return res.json({
+      return res.status(200).json({
+        StatusCode: 200,
         data: {
           accessToken,
           refreshToken: newRefreshToken,
+          user,
         },
       });
     } catch (error) {

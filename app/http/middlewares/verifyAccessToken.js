@@ -20,7 +20,8 @@ function verifyAccessToken(req, res, next) {
     const token = getToken(req.headers);
     JWT.verify(token, ACCESS_TOKEN_SECRET_KEY, async (err, payload) => {
       try {
-        if (err) throw createHttpError.Unauthorized("وارد حساب کاربری خود شوید");
+        if (err)
+          throw createHttpError.Unauthorized("وارد حساب کاربری خود شوید");
         const { mobile } = payload || {};
         const user = await UserModel.findOne(
           { mobile },
@@ -36,27 +37,6 @@ function verifyAccessToken(req, res, next) {
   } catch (error) {
     next(error);
   }
-}
-
-function verifyRefreshToken(token) {
-  return new Promise((resolve, reject) => {
-    JWT.verify(token, REFRESH_TOKEN_SECRET_KEY, async (err, payload) => {
-      if (err)
-        reject(createHttpError.Unauthorized(" وارد حساب کاربری خود شوید"));
-      const { mobile } = payload || {};
-      const user = await UserModel.findOne({ mobile }, { password: 0, otp: 0 });
-      if (!user) reject(createHttpError.Unauthorized("حساب کاربری یافت نشد"));
-      const refreshToken = await redisClient.get(user?._id || "key_default");
-      if (!refreshToken)
-        reject(
-          createHttpError.Unauthorized("ورود مجدد به حساب کاربری انجام نشد")
-        );
-      if (token === refreshToken) return resolve(mobile);
-      reject(
-        createHttpError.Unauthorized("ورود مجدد به حساب کاربری انجام نشد")
-      );
-    });
-  });
 }
 
 function checkRole(role) {
@@ -76,6 +56,5 @@ function checkRole(role) {
 
 module.exports = {
   verifyAccessToken,
-  verifyRefreshToken,
   checkRole,
 };

@@ -1,9 +1,6 @@
-	
-Response body
-Download
 {
   "data": {
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTcwMTI3OTI3MSwiZXhwIjoxNzMyODM2ODcxfQ.leWbaY4FJBJ3DFEeyqE5YruZmmoQTR_KGTEcmLpNUUY",
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTcwMTI3OTI3MSwiZXhwIjoxNzMyODM2ODcxfQ.vqvjT4--pgmixbzmwEXCKxwT4-lRmtavJ9ma1Xp1uuU"
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTcwMTc5Nzg0OCwiZXhwIjoxNzMzMzU1NDQ4fQ.aqDmcK5jPGNqHMuWqtFm4piAb4ZsgDjGkYtbtZPr5yg",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTM5ODUxNjM0MyIsImlhdCI6MTcwMTc5Nzg0OCwiZXhwIjoxNzMzMzU1NDQ4fQ.-ItlEkiA5epgchmS2rcuToUrn5kqI1iYbEz9OrKJWqg"
   }
 }
