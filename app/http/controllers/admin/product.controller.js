@@ -1,77 +1,168 @@
+const createHttpError = require("http-errors");
 const { ProductModel } = require("../../../models/products");
-const { ListOfImagesFromRequest, setFeatures, deleteFileInPublic } = require("../../../utils/functions");
-const { createProductSchema } = require("../../validators/admin/product.schema");
+const {
+  ListOfImagesFromRequest,
+  setFeatures,
+  deleteFileInPublic,
+} = require("../../../utils/functions");
+const {
+  createProductSchema,
+} = require("../../validators/admin/product.schema");
+const { ObjectIdValidator } = require("../../validators/public.validator");
 const Controller = require("../controller");
+const { StatusCodes: HttpStatus }=require('http-status-codes')
 
-class ProductController extends Controller{
-async addProduct(req,res,next){
+const ProductBlackList = {
+  BOOKMARKS: "bookmarks",
+  LIKES: "likes",
+  DISLIKES: "dislikes",
+  COMMENTS: "comments",
+  SUPPLIER: "supplier",
+  WEIGHT: "weight",
+  WIDTH: "width",
+  LENGTH: "length",
+  HEIGHT: "height",
+  COLORS: "colors"
+}
+Object.freeze(ProductBlackList)
+class ProductController extends Controller {
+  async addProduct(req, res, next) {
     try {
-      console.log("req.body",req.body);
-        const images = ListOfImagesFromRequest(req?.files || [], req.body.fileUploadPath)
-        const productBody = await createProductSchema.validateAsync(req.body);
-        const { title, text, short_text, category, tags, count, price, discount, type } = productBody;
-        const supplier = req.user._id;
-        let features = setFeatures(req.body)
-        const product = await ProductModel.create({
-          title,
-          text,
-          short_text,
-          category,
-          tags,
-          count,
-          price,
-          discount,
-          images,
-          features,
-          supplier,
-          type
-        })
-        return res.status(200).json({
-          statusCode: 200,
-          data: {
-            message: "ثبت محصول با موفقیت انجام شد"
-          }
+      console.log("req.body", req.body);
+      const images = ListOfImagesFromRequest(
+        req?.files || [],
+        req.body.fileUploadPath
+      );
+      const productBody = await createProductSchema.validateAsync(req.body);
+      const {
+        title,
+        text,
+        short_text,
+        category,
+        tags,
+        count,
+        price,
+        discount,
+        type,
+      } = productBody;
+      const supplier = req.user._id;
+      let features = setFeatures(req.body);
+      const product = await ProductModel.create({
+        title,
+        text,
+        short_text,
+        category,
+        tags,
+        count,
+        price,
+        discount,
+        images,
+        features,
+        supplier,
+        type,
+      });
+      return res.status(200).json({
+        statusCode: 200,
+        data: {
+          message: "ثبت محصول با موفقیت انجام شد",
+        },
+      });
+    } catch (error) {
+      deleteFileInPublic(req.body.image);
+      console.log("error:", error);
+      next(error);
+    }
+  }
+
+  async editProduct(req, res, next) {
+    try {
+      const { id } = req.params;
+      const product = await this.findProductById(id)
+      const data = copyObject(req.body);
+      data.images = ListOfImagesFromRequest(req?.files || [], req.body.fileUploadPath);
+      data.features = setFeatures(req.body)
+      let blackListFields = Object.values(ProductBlackList);
+      deleteInvalidPropertyInObject(data, blackListFields)
+      const updateProductResult = await ProductModel.updateOne({ _id: product._id }, { $set: data })
+      if (updateProductResult.modifiedCount == 0) throw { status: HttpStatus.INTERNAL_SERVER_ERROR, message: "خطای داخلی" }
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        data : {
+          message: "به روز رسانی باموفقیت انجام شد"
+        }
+      })
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async removeProductById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const product = await this.findProductById(id);
+      const removeProductResult = await ProductModel.deleteOne({
+        _id: product._id,
+      });
+      if (removeProductResult.deletedCount == 0)
+        throw createError.InternalServerError();
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        data: {
+          message: "حذف محصول با موفقیت انجام شد",
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getAllProducts(req, res, next) {
+    try {
+      const search = req?.query?.search || "";
+      let products;
+      if (search) {
+        products = await ProductModel.find({
+          $text: {
+            $search: new RegExp(search, "ig"),
+          },
         });
-      } catch (error) {
-        deleteFileInPublic(req.body.image)
-        console.log('error:',error);
-        next(error);
+      } else {
+        products = await ProductModel.find({});
       }
-}
-
-async editProduct(req,res,next){
-    try {
-        
+      return res.status(200).json({
+        statusCode: 200,
+        data: {
+          products,
+        },
+      });
     } catch (error) {
-        
+      next(error);
     }
-}
+  }
 
-async removeProduct(req,res,next){
+  async getOneProduct(req, res, next) {
     try {
-        
+      const { id } = req.params;
+      const product = await this.findProductById(id);
+      return res.status(200).json({
+        statusCode: 200,
+        data: {
+          product,
+        },
+      });
     } catch (error) {
-        
+      next(error);
     }
+  }
+
+  async findProductById(productID) {
+    const { id } = await ObjectIdValidator.validateAsync({ id: productID });
+    const product = await ProductModel.findById(id);
+    if (!product) throw new createHttpError.NotFound("محصولی یافت نشد");
+    return product;
+  }
 }
 
-async getAllProducts(req,res,next){
-    try {
-        
-    } catch (error) {
-        
-    }
-}
-
-async getOneProduct(req,res,next){
-    try {
-        
-    } catch (error) {
-        
-    }
-}
-}
-
-module.exports={
-    ProductController:new ProductController()
-}
+module.exports = {
+  ProductController: new ProductController(),
+};
